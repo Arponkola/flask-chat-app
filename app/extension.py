@@ -3,5 +3,5 @@ from flask_socketio import SocketIO
 from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
-socketio = SocketIO()
+socketio = SocketIO(cors_allowed_origins="*", async_mode="eventlet")
 bcrypt = Bcrypt()
