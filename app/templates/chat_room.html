@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='room.css') }}">
+    <title>Chat</title>
+</head>
+<body>
+    <div class="container">
+        <h2> Room Code : 
+            <span style="color:red;font-style:italic;">{{room}}       
+            </span>
+        </h2>
+        
+        <div class="chat-msg" id="chat-box">
+        </div>
+        
+        <div class="sending-box">
+            <input type="text" id="msg" placeholder="type your messege here..." required>
+            <button onclick="sendMessage()">send</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    
+    <script>
+        var socket = io();
+        const myName = {{name | tojson}}
+        const msgInput = document.getElementById('msg');
+        const chatBox = document.getElementById('chat-box')
+
+        socket.on('message', (data) => {
+            const wrapper = document.createElement('div');
+            const bubble = document.createElement('div')
+            wrapper.classList.add("chat")
+            bubble.classList.add("bubble")
+
+            if(data.user === myName) {
+                wrapper.classList.add("right")
+                user = "You : "
+            } else {
+                wrapper.classList.add("left")
+                user = data.user + " : "
+            }
+            
+            bubble.innerText = user + data.msg;
+            wrapper.appendChild(bubble);
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        })
+
+        
+        function sendMessage() {
+            data = msgInput.value
+            socket.emit("message", data)
+            msgInput.value = ""
+        }
+        
+        msgInput.addEventListener('keydown', (event)=>{
+            if(event.key == "Enter") {
+                sendMessage()
+            }
+        });
+    </script>
+</body>
+</html>
